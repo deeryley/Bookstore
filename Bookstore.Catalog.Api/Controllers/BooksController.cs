@@ -1,4 +1,5 @@
-﻿using Bookstore.Catalog.Api.Contexts;
+﻿using AutoMapper;
+using Bookstore.Catalog.Api.Contexts;
 using Bookstore.Catalog.Api.Dto.Books;
 using Bookstore.Catalog.Api.Entities;
 using Microsoft.AspNetCore.Http;
@@ -15,10 +16,12 @@ namespace Bookstore.Catalog.Api.Controllers
     public class BooksController : ControllerBase
     {
         private readonly CatalogDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BooksController(CatalogDbContext context)
+        public BooksController(CatalogDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookResponse>>> Get()
@@ -32,7 +35,7 @@ namespace Bookstore.Catalog.Api.Controllers
                   .ThenInclude(x=> x.Genre)
                 .ToListAsync();
 
-            var bookResponses = books.Select(x => new BookResponse()
+            /*var bookResponses = books.Select(x => new BookResponse()
             {
                 BookID = x.BookID,
                 ISBN = x.ISBN,
@@ -55,8 +58,11 @@ namespace Bookstore.Catalog.Api.Controllers
                     GenreName = g.Genre.Name,
                 }).ToList()
 
-            });
-            
+            }); 
+            */
+
+            var bookResponses = _mapper.Map<List<BookResponse>>(books);
+
             return Ok(bookResponses);
         }
         [HttpGet("{id}")]

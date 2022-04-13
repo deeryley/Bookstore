@@ -32,6 +32,8 @@ namespace Bookstore.Catalog.Api
            {
                options.UseSqlServer(Configuration.GetConnectionString("catalog"));
            });
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
