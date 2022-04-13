@@ -35,33 +35,7 @@ namespace Bookstore.Catalog.Api.Controllers
                   .ThenInclude(x=> x.Genre)
                 .ToListAsync();
 
-            /*var bookResponses = books.Select(x => new BookResponse()
-            {
-                BookID = x.BookID,
-                ISBN = x.ISBN,
-                Title = x.Title,
-                Year = x.Year,
-                Price = x.Price,
-                LanguageID = x.LanguageID,
-                LanguageName = x.Language.Name,
-                PublisherID = x.PublisherID,
-                PublisherCompanyName = x.Publisher.CompanyName,
-                Authors = x.Authors.Select(a => new BookAuthorResponse()
-                {
-                    AuthorID = a.AuthorID,
-                    AuthorFirstName = a.Author.FirstName,
-                    AuthorLastName = a.Author.LastName
-                }).ToList(),
-                Genres = x.Genres.Select(g => new BookGenreResponse()
-                {
-                    GenreID = g.GenreID,
-                    GenreName = g.Genre.Name,
-                }).ToList()
-
-            }); 
-            */
-
-            var bookResponses = _mapper.Map<List<BookResponse>>(books);
+           var bookResponses = _mapper.Map<List<BookResponse>>(books);
 
             return Ok(bookResponses);
         }
@@ -73,15 +47,22 @@ namespace Bookstore.Catalog.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok(book);
+
+            var bookResponse = _mapper.Map<BookResponse>(book);
+
+            return Ok(bookResponse);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Book>> Post(Book book)
+        public async Task<ActionResult<BookResponse>> Post(BookRequest bookRequest)
         {
+            var book = _mapper.Map<Book>(bookRequest);
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("Get", new { id = book.BookID }, book);
+
+            var bookResponse = _mapper.Map<BookResponse>(book);
+
+            return CreatedAtAction("Get", new { id = bookResponse.BookID }, bookResponse);
         }
     }
 }
