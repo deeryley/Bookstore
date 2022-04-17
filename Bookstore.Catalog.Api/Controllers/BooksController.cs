@@ -3,6 +3,7 @@ using Bookstore.Catalog.Api.Contexts;
 using Bookstore.Catalog.Api.Dto.Books;
 using Bookstore.Catalog.Api.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -64,5 +65,61 @@ namespace Bookstore.Catalog.Api.Controllers
 
             return CreatedAtAction("Get", new { id = bookResponse.BookID }, bookResponse);
         }
+
+        [HttpPut("bookID")]
+        public async Task<ActionResult<BookResponse>> Put(int bookID, BookRequest bookRequest)
+        {
+            var originalBook = await _context.Books.FindAsync(bookID);
+            if (originalBook == null)
+            {
+                return NotFound();
+
+            }
+            _mapper.Map(bookRequest, originalBook);
+            _context.Entry(originalBook).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            var bookResponse = _mapper.Map<BookResponse>(originalBook);
+            return Ok(bookResponse);
+        }
+
+
+        [HttpPatch("{bookId}")]
+        [Consumes("application/json-patch+json")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<ActionResult<BookResponse>> Patch(int bookId, [FromBody] JsonPatchDocument<BookRequest> bookRequestPatch)
+        {
+            var originalBook = await _context.Books.FindAsync(bookId);
+            if (originalBook == null)
+            {
+                return NotFound();
+            }
+
+            var bookRequest = _mapper.Map<BookRequest>(originalBook);
+            bookRequestPatch.ApplyTo(bookRequest);
+
+            _mapper.Map(bookRequest, originalBook);
+            _context.Entry(originalBook).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            var bookResponse = _mapper.Map<BookResponse>(originalBook);
+            return Ok(bookResponse);
+        }
+
+        [HttpDelete("{bookID}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<ActionResult> Delete(int bookId)
+        {
+            var book = await  _context.Books.FindAsync(bookId);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
     }
 }
