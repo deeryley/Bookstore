@@ -1,18 +1,20 @@
+using AutoMapper;
 using Bookstore.Catalog.Api.Contexts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
+
 
 namespace Bookstore.Catalog.Api
 {
@@ -32,11 +34,27 @@ namespace Bookstore.Catalog.Api
            {
                options.UseSqlServer(Configuration.GetConnectionString("catalog"));
            });
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
+            services.AddAutoMapper(typeof(Startup));
+
+            services.AddControllers(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bookstore.Catalog.Api", Version = "v1" });
+                options.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
             });
+
+            services.AddSwaggerGen(config =>
+           {
+               config.SwaggerDoc("v1", new OpenApiInfo
+               {
+                   Version = "v1",
+                   Title = "Bookstore Catalog API",
+                   Description = "An API for the bookstore catalog."
+               });
+
+               var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+               var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+               config.IncludeXmlComments(xmlPath);
+
+           });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,9 +63,14 @@ namespace Bookstore.Catalog.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Bookstore.Catalog.Api v1"));
+
             }
+            app.UseSwagger();
+            app.UseSwaggerUI(config =>
+            {
+                config.SwaggerEndpoint("/swagger/v1/swagger.json", "Bookstore Catalog API");
+            });
+
 
             app.UseHttpsRedirection();
 
@@ -59,6 +82,22 @@ namespace Bookstore.Catalog.Api
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
+        {
+            var builder = new ServiceCollection()
+                .AddLogging()
+                .AddMvc()
+                .AddNewtonsoftJson()
+                .Services.BuildServiceProvider();
+
+            return builder
+                .GetRequiredService<IOptions<MvcOptions>>()
+                .Value
+                .InputFormatters
+                .OfType<NewtonsoftJsonPatchInputFormatter>()
+                .First();
         }
     }
 }
