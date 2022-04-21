@@ -18,7 +18,7 @@ namespace Bookstore.Catalog.Api.Entities
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
         public Language Language { get; set; }
-       public Publisher Publisher { get; set; }
+        public Publisher Publisher { get; set; }
         public ICollection<BookAuthor> Authors { get; set; }
         public ICollection<BookGenre> Genres { get; set; }
 

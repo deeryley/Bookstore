@@ -14,6 +14,7 @@ namespace Bookstore.Catalog.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class BooksController : ControllerBase
     {
         private readonly CatalogDbContext _context;
@@ -24,24 +25,37 @@ namespace Bookstore.Catalog.Api.Controllers
             _context = context;
             _mapper = mapper;
         }
+
+
+        /// <summary>
+        /// Returns all the books
+        /// </summary>
+        /// <returns>all books</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookResponse>>> Get()
         {
             var books = await _context.Books
-                .Include(x=> x.Publisher)
-                .Include(x=> x.Language)
-                .Include(x=> x.Authors)
+                .Include(x => x.Publisher)
+                .Include(x => x.Language)
+                .Include(x => x.Authors)
                    .ThenInclude(x => x.Author)
-                .Include(x=> x.Genres)
-                  .ThenInclude(x=> x.Genre)
+                .Include(x => x.Genres)
+                  .ThenInclude(x => x.Genre)
                 .ToListAsync();
 
-           var bookResponses = _mapper.Map<List<BookResponse>>(books);
+            var bookResponses = _mapper.Map<List<BookResponse>>(books);
 
             return Ok(bookResponses);
         }
+
+        /// <summary>
+        /// Returns a single book by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> Get(int id)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<BookResponse>> Get(int id)
         {
             var book = await _context.Books.FindAsync(id);
             if (book == null)
@@ -55,6 +69,8 @@ namespace Bookstore.Catalog.Api.Controllers
         }
 
         [HttpPost]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<BookResponse>> Post(BookRequest bookRequest)
         {
             var book = _mapper.Map<Book>(bookRequest);
@@ -67,6 +83,8 @@ namespace Bookstore.Catalog.Api.Controllers
         }
 
         [HttpPut("bookID")]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<BookResponse>> Put(int bookID, BookRequest bookRequest)
         {
             var originalBook = await _context.Books.FindAsync(bookID);
@@ -110,7 +128,7 @@ namespace Bookstore.Catalog.Api.Controllers
 
         public async Task<ActionResult> Delete(int bookId)
         {
-            var book = await  _context.Books.FindAsync(bookId);
+            var book = await _context.Books.FindAsync(bookId);
             if (book == null)
             {
                 return NotFound();
