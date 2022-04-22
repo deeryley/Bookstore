@@ -6,11 +6,13 @@ namespace Bookstore.Catalog.Api.Mapping
 {
     public class CatalogMappingProfile : Profile
     {
-       public CatalogMappingProfile()
+        public CatalogMappingProfile()
         {
             CreateMap<Book, BookResponse>().ReverseMap();
             CreateMap<BookAuthor, BookAuthorResponse>().ReverseMap();
             CreateMap<BookGenre, BookGenreResponse>().ReverseMap();
+            CreateMap<Genre, GenreResponse>().ReverseMap();
+
         }
     }
 }
