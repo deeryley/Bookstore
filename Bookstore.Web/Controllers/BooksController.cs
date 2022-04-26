@@ -19,5 +19,25 @@ namespace Bookstore.Web.Controllers
 
             return View(books);
         }
+
+        public async Task<IActionResult> Authors()
+        {
+            var authors = await _bookCatalog.GetAllAuthors();
+            return View(authors);
+        }
+
+        ///
+        public async Task<IActionResult> Author(int id)
+        {
+            var author = await _bookCatalog.GetAuthor(id);
+            return View(author);
+        }
+
+        public async Task<IActionResult> Book(int id)
+        {
+            var book = await _bookCatalog.GetBook(id);
+            return View(book);
+        }
+
     }
 }
