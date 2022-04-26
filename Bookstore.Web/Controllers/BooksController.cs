@@ -7,10 +7,12 @@ namespace Bookstore.Web.Controllers
     public class BooksController : Controller
     {
         private BookCatalogService _bookCatalog;
+        private OpenLibraryService _openLibrary;
 
-        public BooksController(BookCatalogService bookCatalog)
+        public BooksController(BookCatalogService bookCatalog, OpenLibraryService openLibraryService)
         {
             _bookCatalog = bookCatalog;
+            _openLibrary = openLibraryService;
         }
 
         public async Task<IActionResult> Index()
@@ -36,6 +38,10 @@ namespace Bookstore.Web.Controllers
         public async Task<IActionResult> Book(int id)
         {
             var book = await _bookCatalog.GetBook(id);
+
+            var openLibraryBook = await _openLibrary.GetBookByISBN(book.ISBN);
+            ViewBag.OpenLibraryBook = openLibraryBook;
+
             return View(book);
         }
 

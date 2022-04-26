@@ -29,7 +29,10 @@ namespace Bookstore.Web
                options.BaseAddress = new Uri("https://localhost:44355/api/");
            });
 
-
+            services.AddHttpClient<OpenLibraryService>(options =>
+           {
+               options.BaseAddress = new Uri("https://openlibrary.org/api/");
+           });
 
             services.AddControllersWithViews();
         }
