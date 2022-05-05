@@ -8,11 +8,13 @@ namespace Bookstore.Web.Controllers
     {
         private BookCatalogService _bookCatalog;
         private OpenLibraryService _openLibrary;
+        private EcontService _econtService;
 
-        public BooksController(BookCatalogService bookCatalog, OpenLibraryService openLibraryService)
+        public BooksController(BookCatalogService bookCatalog, OpenLibraryService openLibraryService, EcontService econtService)
         {
             _bookCatalog = bookCatalog;
             _openLibrary = openLibraryService;
+            _econtService = econtService;
         }
 
         public async Task<IActionResult> Index()
@@ -45,5 +47,14 @@ namespace Bookstore.Web.Controllers
             return View(book);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> BookPurchase(int id)
+        {
+            var book = await _bookCatalog.GetBook(id);
+
+            var econtResponse = await _econtService.CreateLabel();
+
+            return View("BookPurchased", econtResponse);
+        }
     }
 }

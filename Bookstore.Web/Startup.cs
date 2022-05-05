@@ -33,6 +33,10 @@ namespace Bookstore.Web
            {
                options.BaseAddress = new Uri("https://openlibrary.org/api/");
            });
+            services.AddHttpClient<EcontService>(options =>
+            {
+                options.BaseAddress = new Uri("http://demo.econt.com/ee/services/");
+            });
 
             services.AddControllersWithViews();
         }
