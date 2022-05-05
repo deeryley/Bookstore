@@ -6,16 +6,16 @@ namespace Bookstore.Catalog.Api.Contexts
     public class CatalogDbContext : DbContext
     {
         public DbSet<Book> Books { get; set; }
-        public DbSet<Author> Author { get; set; }
-        public DbSet<Genre> Genres { get; set; }    
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Genre> Genres { get; set; }
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Language> Languages { get; set; }
 
-       public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options)
+        public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options)
         {
 
         }
-        protected override void OnModelCreating (ModelBuilder mb)
+        protected override void OnModelCreating(ModelBuilder mb)
         {
             base.OnModelCreating(mb);
 
@@ -26,9 +26,9 @@ namespace Bookstore.Catalog.Api.Contexts
                 b.Property(x => x.Title).IsRequired().HasMaxLength(300);
                 b.Property(x => x.Price).HasColumnType("decimal(10,2)");
 
-                b.HasOne(x => x.Publisher).WithMany(x => x.Books).HasForeignKey(x => x.PublisherID); 
+                b.HasOne(x => x.Publisher).WithMany(x => x.Books).HasForeignKey(x => x.PublisherID);
                 b.HasOne(x => x.Language).WithMany(x => x.Books).HasForeignKey(x => x.LanguageID);
-                b.HasMany(x => x.Authors).WithOne(x =>x.Book).HasForeignKey(x => x.BookID);
+                b.HasMany(x => x.Authors).WithOne(x => x.Book).HasForeignKey(x => x.BookID);
                 b.HasMany(x => x.Genres).WithOne(x => x.Book).HasForeignKey(x => x.BookID);
             });
 
@@ -37,7 +37,7 @@ namespace Bookstore.Catalog.Api.Contexts
                 a.Property(x => x.FirstName).IsRequired().HasMaxLength(100);
                 a.Property(x => x.LastName).IsRequired().HasMaxLength(100);
 
-                a.HasMany(x => x.Books).WithOne(x=> x.Author).HasForeignKey(x => x.AuthorID);
+                a.HasMany(x => x.Books).WithOne(x => x.Author).HasForeignKey(x => x.AuthorID);
             });
 
             mb.Entity<Publisher>(p =>
@@ -57,7 +57,7 @@ namespace Bookstore.Catalog.Api.Contexts
             mb.Entity<Language>(l =>
             {
                 l.Property(x => x.Name).IsRequired().HasMaxLength(50);
-                l.HasMany(x => x.Books).WithOne(x => x.Language).HasForeignKey(x=> x.LanguageID);
+                l.HasMany(x => x.Books).WithOne(x => x.Language).HasForeignKey(x => x.LanguageID);
 
                 l.HasData(new Language()
                 {

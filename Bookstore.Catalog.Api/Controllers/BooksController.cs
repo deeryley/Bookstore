@@ -31,7 +31,7 @@ namespace Bookstore.Catalog.Api.Controllers
         /// Returns all the books
         /// </summary>
         /// <returns>all books</returns>
-        [HttpGet]
+        [HttpGet(Name = "GetAll")]
         public async Task<ActionResult<IEnumerable<BookResponse>>> Get()
         {
             var books = await _context.Books

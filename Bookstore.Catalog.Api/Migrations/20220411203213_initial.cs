@@ -8,7 +8,7 @@ namespace Bookstore.Catalog.Api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Author",
+                name: "Authors",
                 columns: table => new
                 {
                     AuthorID = table.Column<int>(type: "int", nullable: false)
